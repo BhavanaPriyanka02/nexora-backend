@@ -11,17 +11,25 @@ from app.routes.auth import router as auth_router
 
 app = FastAPI()
 
+# Create tables
 Base.metadata.create_all(bind=engine)
 
+# ✅ Allowed frontend URLs
+origins = [
+    "http://localhost:5173",  # local development
+    "https://nexora-frontend-woad.vercel.app"  # deployed frontend
+]
 
+# ✅ CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Routers
 app.include_router(products_router, prefix="/products")
 app.include_router(cart_router, prefix="/cart")
 app.include_router(orders_router, prefix="/orders")
