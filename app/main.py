@@ -16,11 +16,11 @@ Base.metadata.create_all(bind=engine)
 
 # ✅ Allowed frontend URLs
 origins = [
-    "http://localhost:5173",  # local development
-    "https://nexora-frontend-woad.vercel.app"  # deployed frontend
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://nexora-frontend-woad.vercel.app"
 ]
 
-# ✅ CORS Middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
