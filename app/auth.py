@@ -17,13 +17,25 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 
-# 🔐 Password Hashing
+# 🔐 Password Hashing (SAFE VERSION)
 def hash_password(password: str):
+    if not isinstance(password, str):
+        raise HTTPException(status_code=400, detail="Invalid password format")
+
+    if len(password.encode("utf-8")) > 72:
+        raise HTTPException(
+            status_code=400,
+            detail="Password too long (max 72 characters)"
+        )
+
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        return pwd_context.verify(plain_password, hashed_password)
+    except Exception:
+        return False
 
 
 # 🔑 JWT Creation
