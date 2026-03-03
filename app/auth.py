@@ -8,34 +8,22 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User
 
-
 SECRET_KEY = "supersecretkey"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# ✅ FIXED HERE (use bcrypt_sha256 instead of bcrypt)
+pwd_context = CryptContext(schemes=["bcrypt_sha256"], deprecated="auto")
 security = HTTPBearer()
 
 
-# 🔐 Password Hashing (SAFE VERSION)
+# 🔐 Password Hashing
 def hash_password(password: str):
-    if not isinstance(password, str):
-        raise HTTPException(status_code=400, detail="Invalid password format")
-
-    if len(password.encode("utf-8")) > 72:
-        raise HTTPException(
-            status_code=400,
-            detail="Password too long (max 72 characters)"
-        )
-
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password, hashed_password):
-    try:
-        return pwd_context.verify(plain_password, hashed_password)
-    except Exception:
-        return False
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 # 🔑 JWT Creation
@@ -46,7 +34,7 @@ def create_access_token(data: dict):
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-# 👤 Get Current User From Token (DB Version)
+# 👤 Get Current User
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
