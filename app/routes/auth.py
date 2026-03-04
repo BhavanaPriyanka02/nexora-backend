@@ -14,7 +14,8 @@ def register(user: dict, db: Session = Depends(get_db)):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already exists")
 
-    hashed = hash_password(user["password"])
+    password = user["password"][:72]
+    hashed = hash_password(password)
 
     new_user = User(
         email=user["email"],
