@@ -10,35 +10,36 @@ router = APIRouter()
 
 @router.post("/register")
 def register(user: UserRegister, db: Session = Depends(get_db)):
-    existing_user = db.query(User).filter(User.email == user["email"]).first()
+
+    existing_user = db.query(User).filter(User.email == user.email).first()
 
     if existing_user:
         raise HTTPException(status_code=400, detail="User already exists")
 
-    hashed_password = hash_password(user["password"])
+    hashed_password = hash_password(user.password)
 
     new_user = User(
-        email=user["email"],
+        email=user.email,
         password=hashed_password,
-        role="user"
+        role="customer"
     )
 
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
 
-    return {"message": "User created"}
+    return {"message": "User created successfully"}
 
 
 @router.post("/login")
-def login(user: dict, db: Session = Depends(get_db)):
+def login(user: UserLogin, db: Session = Depends(get_db)):
 
-    db_user = db.query(User).filter(User.email == user["email"]).first()
+    db_user = db.query(User).filter(User.email == user.email).first()
 
     if not db_user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    if not verify_password(user["password"], db_user.password):
+    if not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     token = create_access_token({
