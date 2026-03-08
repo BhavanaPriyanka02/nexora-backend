@@ -23,12 +23,3 @@ class ProductResponse(ProductBase):
     class Config:
         from_attributes = True
 
-
-class UserRegister(BaseModel):
-    email: EmailStr
-    password: str
-
-
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
