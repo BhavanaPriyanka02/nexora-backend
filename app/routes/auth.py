@@ -3,13 +3,13 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User
 from app.auth import hash_password, verify_password, create_access_token
+from app.schemas import UserRegister, UserLogin
 
 router = APIRouter()
 
 
 @router.post("/register")
-def register(user: dict, db: Session = Depends(get_db)):
-
+def register(user: UserRegister, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user["email"]).first()
 
     if existing_user:
